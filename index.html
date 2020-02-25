@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>jQuery UI Autocomplete functionality</title>
+    <link href="https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        /* Create two equal columns that floats next to each other */
+        .column {
+            float: left;
+            width: 50%;
+            padding: 10px;
+            height: 300px;
+            /* Should be removed. Only for demonstration */
+        }
+
+        /* Clear floats after the columns */
+        .row:after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+    </style>
+
+    <!-- Javascript -->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#tags").autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        method: "GET",
+                        dataType: "json",
+                        url: "https://maps.tt.hyperloopnepal.com/forward?q=" + request.term,
+                        success: function (data) {
+                            console.log(data);
+                            var transformed = $.map(data.features, function (el) {
+                                return {
+                                    label: el.properties.name + ", " + el.properties.street + ", " + el.properties.city + ", " + el.properties.country,
+                                    id: el.properties.osm_id
+                                };
+                            });
+                            response(transformed);
+                        },
+                        error: function () {
+                            response([]);
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</head>
+
+<body>
+
+    <div class="row">
+
+        <div class="column">
+            <div class="ui-widget">
+                <label for="tags">Tags: </label>
+                <input id="tags">
+            </div>
+        </div>
+
+        <div class="column">
+            <div class="div">
+                <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+                    integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+                    crossorigin="" />
+                <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+                    integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+                    crossorigin=""></script>
+
+                <div class="container-fluid">
+                    <div id="mapid" style="width: 900px; height: 900px;"></div>
+                </div>
+
+                <script>
+
+                    var mymap = L.map('mapid').setView([27.7172, 85.3240], 12);
+
+                    L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+                        maxZoom: 18,
+                        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+                            '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                            'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                        id: 'mapbox/streets-v11'
+                    }).addTo(mymap);
+                    var marker = L.marker([27.7172, 85.3240]).addTo(mymap);
+                    L.Routing.control({
+                        waypoints: [
+                            L.latLng(27.7172, 85.3240),
+                            L.latLng(28.5300, 83.8780)
+                        ],
+                        routeWhileDragging: true
+                    }).addTo(mymap);
+
+                </script>
+            </div>
+        </div>
+    </div>
+    <!-- HTML -->
+
+
+
+</body>
+
+</html>
