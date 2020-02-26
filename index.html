@@ -30,33 +30,6 @@
         }
     </style>
 
-    <!-- Javascript -->
-    <script type="text/javascript">
-        $(document).ready(function () {
-            $("#tags").autocomplete({
-                source: function (request, response) {
-                    $.ajax({
-                        method: "GET",
-                        dataType: "json",
-                        url: "https://maps.tt.hyperloopnepal.com/forward?q=" + request.term,
-                        success: function (data) {
-                            console.log(data);
-                            var transformed = $.map(data.features, function (el) {
-                                return {
-                                    label: el.properties.name + ", " + el.properties.street + ", " + el.properties.city + ", " + el.properties.country,
-                                    id: el.properties.osm_id
-                                };
-                            });
-                            response(transformed);
-                        },
-                        error: function () {
-                            response([]);
-                        }
-                    });
-                }
-            });
-        });
-    </script>
 </head>
 
 <body>
@@ -65,7 +38,7 @@
 
         <div class="column">
             <div class="ui-widget">
-                <label for="tags">Tags: </label>
+                <label for="tags">Search Destination: </label>
                 <input id="tags">
             </div>
         </div>
@@ -85,6 +58,49 @@
 
                 <script>
 
+                    var transformed = '';
+
+
+                    $(document).ready(function () {
+                        $("#tags").autocomplete({
+                            source: function (request, response) {
+                                $.ajax({
+                                    method: "GET",
+                                    // dataType: "json",
+                                    url: "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=" + request.term + "&location=27.7172,85.3240&radius=20000&strictbounds&key=AIzaSyDTrhOpIqfYqP3x9DMdbm-_GL28KBuCOGY",
+                                    crossDomain: true,
+                                    success: function (data) {
+                                        transformed = $.map(data.predictions, function (el) {
+                                            console.log(data.predictions)
+                                            return {
+                                                label: el.description,
+                                                id: el.id
+                                            };
+
+                                        });
+                                        console.log(transformed)
+                                        // for (i = 0; i < transformed.length; i++) {
+                                        //     console.log(transformed[i].lat)
+                                        // }
+
+                                        response(transformed);
+                                    },
+                                    error: function () {
+                                        response([]);
+                                    }
+
+                                });
+
+                            }
+                        });
+
+                    });
+                    // for (i = 0; i < transformed.length; i++) {
+                    //                         console.log(transformed[i].lat)
+                    //                     }
+                    // console.log(transformed[0].lat)
+
+
                     var mymap = L.map('mapid').setView([27.7172, 85.3240], 12);
 
                     L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
@@ -94,22 +110,18 @@
                             'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
                         id: 'mapbox/streets-v11'
                     }).addTo(mymap);
-                    var marker = L.marker([27.7172, 85.3240]).addTo(mymap);
-                    L.Routing.control({
-                        waypoints: [
-                            L.latLng(27.7172, 85.3240),
-                            L.latLng(28.5300, 83.8780)
-                        ],
-                        routeWhileDragging: true
-                    }).addTo(mymap);
+
+                    var marker = L.marker([27.7172, 85.3240]).addTo(mymap)
+
+                    for (i = 0; i < transformed.length; i++) {
+                        var marker = L.marker([transformed[i].lat, transformed[i].lon]).addTo(mymap);
+                        console.log(transformed[i].lat)
+                    }
 
                 </script>
             </div>
         </div>
     </div>
-    <!-- HTML -->
-
-
 
 </body>
 
