@@ -67,14 +67,15 @@
                                 $.ajax({
                                     method: "GET",
                                     // dataType: "json",
-                                    url: "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=" + request.term + "&location=27.7172,85.3240&radius=20000&strictbounds&key=AIzaSyDTrhOpIqfYqP3x9DMdbm-_GL28KBuCOGY",
+                                    thing: "https://nominatim.openstreetmap.org/search.php?q=lakeside+pokhara&polygon_geojson=1&&viewbox=83.887979,28.134780,84.113703,28.301521&bounded=1&format=json",
+                                    url: "https://nominatim.openstreetmap.org/search.php?q=" + request.term + "&polygon_geojson=1&&viewbox=83.887979,28.134780,84.113703,28.301521&bounded=1&format=json",
                                     crossDomain: true,
                                     success: function (data) {
-                                        transformed = $.map(data.predictions, function (el) {
-                                            console.log(data.predictions)
+                                        transformed = $.map(data, function (el) {
+                                            console.log(data)
                                             return {
-                                                label: el.description,
-                                                id: el.id
+                                                label: el.display_name,
+                                                id: el.place_id
                                             };
 
                                         });
@@ -101,7 +102,7 @@
                     // console.log(transformed[0].lat)
 
 
-                    var mymap = L.map('mapid').setView([27.7172, 85.3240], 12);
+                    var mymap = L.map('mapid').setView([28.2096, 83.9856], 13);
 
                     L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
                         maxZoom: 18,
